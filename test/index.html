@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebCard Test</title>
+  <link rel="stylesheet" href="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+  <link rel="stylesheet" href="style.css" > 
+  <script src="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.js"></script>
+</head>
+<body class="mdc-typograpby">
+  <div class="mdc-layout-grid">
+    <div class="mdc-layout-grid__inner">
+      <div class="mdc-layout-grid__cell--span-8">
+        <h1 class="mdc-typography--headline3">WebCard Test</h1>
+        <button class="mdc-button mdc-button--raised" onclick="ListReaders()">List Readers</button>
+        <div>
+          <h3 class="mdc-typography--subtitle1">Available Readers</h3>
+          <ul class="mdc-list reader-list mdc-list--two-line mdc-list--avatar-list" id="readerList">
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<script type="text/javascript" src="webcard.js"></script>
+<script type="text/javascript">
+  async function ListReaders() {
+    var reader_ul = document.getElementById('readerList');
+    while (reader_ul.firstChild) {
+      reader_ul.removeChild(reader_ul.firstChild);
+    }
+    var readers = await navigator.webcard.readers();
+    readers.forEach((reader, index) => {
+      var node = document.createElement('li');
+      reader_ul.append(node)
+      node.outerHTML = `
+      <li class="mdc-list-item mdc-ripple-upgraded" tabindex="${index}">
+              <span class="mdc-list-item__graphic material-icons" aria-hidden="true">inbox</span>
+              <span class="mdc-list-item__text">
+                <span class="mdc-list-item__primary-text">${reader.name}</span>
+                <span class="mdc-list-item__secondary-text">${reader.atr == "" ? "Empty" : "Card present"}</span>
+              </span>
+            </li>
+      `;
+    });
+    var atr = await readers[0].connect(true);
+    var res = await readers[0].transcieve("00A4040000");
+    console.log("Got this response " + res);
+    readers[0].disconnect();
+  }
+
+  navigator.webcard.cardinserted = function(reader) {
+    console.log('this is my defined handler for ' + reader.name);
+  }
+</script>
+</html>
