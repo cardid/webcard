@@ -20,7 +20,7 @@ else
 	endif
 endif
 
-CC := g++
+CC := clang++
 
 PCSC_CFLAGS := -framework PCSC
 
@@ -31,7 +31,7 @@ FLAGS := $(CXXFLAGS) -std=c++11
 all: clean build webcard
 
 webcard: webcard.cpp
-	$(CC) $(FLAGS) -o bin/webcard webcard.cpp jsmn.c
+	$(CC) $(FLAGS) -o bin/webcard webcard.cpp
 
 build:
 	mkdir bin

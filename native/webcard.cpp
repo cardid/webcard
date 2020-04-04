@@ -3,10 +3,11 @@
 // Copyright (c) 2017 - cardid.org
 
 #include "webcard.h"
-#include "jsmn.h"
+#include "json.hpp"
 // #include <WerApi.h>
 
 using namespace std;
+using json = nlohmann::json;
 
 SCARDCONTEXT _hContext;
 LPTSTR  _pmszReaders;
@@ -46,47 +47,34 @@ int main(int argc, const char * argv[])
 			unsigned int read_char = getchar();
 			input.push_back(read_char);
 		}
-		jsmn_parser parser;
-		jsmntok_t tokens[10];
+		auto o = json::parse(input);
+		string msgid = o["i"].get<std::string>();
+		int readerIndex = 0;
+		unsigned int sharemode = 0;
 
-		jsmn_init(&parser);
-		jsmn_parse(&parser, input.c_str(), input.length(), tokens, 10);
+		if (o.find("r") != o.end()) {
+			readerIndex = o["r"].get<int>();
+		}
 
-		if (tokens[1].type == JSMN_STRING && input.c_str()[tokens[1].start] == 'i' 
-		 && tokens[3].type == JSMN_STRING && input.c_str()[tokens[3].start] == 'c' && tokens[4].type == JSMN_PRIMITIVE)
+		switch (o["c"].get<int>())
 		{
-			string msgid = input.substr(tokens[2].start, tokens[2].end - tokens[2].start);
-			int readerIndex = 0;
-			unsigned int sharemode = 0;
-			if (tokens[5].type == JSMN_STRING && input.c_str()[tokens[5].start] == 'r' && tokens[6].type == JSMN_PRIMITIVE )
-			{
-				readerIndex = stoi(input.substr(tokens[6].start));
+		case 1:
+			ListReaders(msgid);
+			break;
+		case 2:
+			sharemode = SCARD_SHARE_SHARED;
+			if (o.find("p") != o.end()) {
+				sharemode = o["p"].get<int>();
 			}
-
-			switch (input.c_str()[tokens[4].start])
-			{
-			case '1':
-				ListReaders(msgid);
-				break;
-			case '2':
-				sharemode = SCARD_SHARE_SHARED;
-				if (tokens[7].type == JSMN_STRING && input.c_str()[tokens[7].start] == 'p' && tokens[8].type == JSMN_PRIMITIVE)
-				{
-					sharemode = stoi(input.substr(tokens[8].start));
-				}
-				Connect(msgid, readerIndex, sharemode);
-				break;
-			case '3':
-				Disconnect(msgid, readerIndex);
-				break;
-			case '4':
-				if (tokens[7].type == JSMN_STRING && input.c_str()[tokens[7].start] == 'a' && tokens[8].type == JSMN_STRING)
-				{
-					string apdu = input.substr(tokens[8].start, tokens[8].end - tokens[8].start);
-					Transcieve(msgid, readerIndex, apdu);
-				}
-				break;
-			}
+			Connect(msgid, readerIndex, sharemode);
+			break;
+		case 3:
+			Disconnect(msgid, readerIndex);
+			break;
+		case 4:
+			string apdu = o["a"].get<std::string>();
+			Transcieve(msgid, readerIndex, apdu);
+			break;
 		}
 	}
 	ReleaseReaders();
