@@ -128,11 +128,14 @@ void InitializeReaders()
 			_cReaders += 1;
 		}
 		
-#if defined(__linux__) || defined(WIN32)
+#if defined(__linux__)
 		// And last for new readers, this does not exist in Mac OS
+		wchar_t buffer[256];
+		size_t ccNumChar;
+		mbstowcs_s<256>(&ccNumChar, buffer, "\\\\?PnP?\\Notification", 128);
 		_rgConnections = (LPCONN_PARAMS)realloc((LPVOID)_rgConnections, (_cReaders + 1) * sizeof(CONN_PARAMS));
 		_rgReaderStates = (LPSCARD_READERSTATE)realloc((LPVOID)_rgReaderStates, (_cReaders + 1) * sizeof(SCARD_READERSTATE));
-		_rgReaderStates[_cReaders].szReader = "\\\\?PnP?\\Notification";
+		_rgReaderStates[_cReaders].szReader = buffer;
 		_rgReaderStates[_cReaders].dwCurrentState = SCARD_STATE_UNAWARE;
 		_rgReaderStates[_cReaders].pvUserData = (LPVOID)&_rgConnections[_cReaders];
 		_cReaders += 1;
@@ -230,7 +233,8 @@ void ListReaders(string msgid)
 		output.append("{\"n\":\"");
 #ifdef WIN32
 		char buffer[256];
-		size_t ret = wcstombs(buffer, _rgReaderStates[i].szReader, 256);
+		size_t ccNumChar;
+		size_t ret = wcstombs_s(&ccNumChar, buffer, _rgReaderStates[i].szReader, 256);
 		output.append(buffer);
 #else
 		output.append(_rgReaderStates[i].szReader);
@@ -298,20 +302,20 @@ void Disconnect(string msgid, int index)
 void Transcieve(string msgid, int index, string apdu)
 {
 	LONG  lRet;
-	char*	pbTemp;
-	size_t	i;
-	char	pbSend[MAX_APDU_SIZE];
-	char	pbRecv[MAX_APDU_SIZE];
-	size_t	cbSend;
-	size_t	cbRecv;
-	size_t  cbBlock;
-	char	pbTmp[] = "\x0\x0\x0";
+	char* pbTemp;
+	DWORD i;
+	char  pbSend[MAX_APDU_SIZE];
+	char  pbRecv[MAX_APDU_SIZE];
+	DWORD cbSend;
+	DWORD cbRecv;
+	DWORD cbBlock;
+	char  pbTmp[] = "\x0\x0\x0";
 
 	string output = "{\"i\":\"";
 	output.append(msgid);
 	output.append("\",\"d\":\"");
 
-	cbSend = apdu.length() / 2;
+	cbSend = (DWORD)(apdu.length() / 2);
 	pbTemp = (char*)apdu.c_str();
 
 	for (i = 0; i < cbSend; i++)
