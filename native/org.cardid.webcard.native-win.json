@@ -4,6 +4,6 @@
   "path": "x64/Debug/webcard.exe",
   "type": "stdio",
   "allowed_origins": [
-    "chrome-extension://aglimagmodgdikhlafhfmjeopahmcmln/"
+    "chrome-extension://jgadbbjafaacpeiilgomaedddolabmkf/"
   ]
 }
