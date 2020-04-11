@@ -25,17 +25,20 @@
 </body>
 <script type="text/javascript" src="webcard.js"></script>
 <script type="text/javascript">
+  var _readers;
+
   async function ListReaders() {
     var reader_ul = document.getElementById('readerList');
     while (reader_ul.firstChild) {
       reader_ul.removeChild(reader_ul.firstChild);
     }
-    var readers = await navigator.webcard.readers();
-    readers.forEach((reader, index) => {
+    _readers = await navigator.webcard.readers();
+    console.log(_readers.length + " readers detected");
+    _readers.forEach((reader, index) => {
       var node = document.createElement('li');
       reader_ul.append(node)
       node.outerHTML = `
-      <li class="mdc-list-item mdc-ripple-upgraded" tabindex="${index}">
+      <li class="mdc-list-item mdc-ripple-upgraded" tabindex="${index}" onclick="TestReader(${index})">
               <span class="mdc-list-item__graphic material-icons" aria-hidden="true">inbox</span>
               <span class="mdc-list-item__text">
                 <span class="mdc-list-item__primary-text">${reader.name}</span>
@@ -44,10 +47,13 @@
             </li>
       `;
     });
-    var atr = await readers[0].connect(true);
-    var res = await readers[0].transcieve("00A4040000");
+  }
+
+  async function TestReader(index) {
+    var atr = await _readers[index].connect(true);
+    var res = await _readers[index].transcieve("00A4040000");
     console.log("Got this response " + res);
-    readers[0].disconnect();
+    _readers[index].disconnect();
   }
 
   navigator.webcard.cardinserted = function(reader) {
