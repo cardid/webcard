@@ -1,22 +1,30 @@
-var tab = null;
-var nativePort = null;
-var contentPort = null;
+var nativePort = null;  // Connection with native app
+var contentPorts = new Map();
 
 chrome.runtime.onConnect.addListener(function(port) {
   console.assert(port.name == "webcard");
-  if (!contentPort)
-    contentPort = port;
+  contentPorts.set(port.sender.tab.id, port);
   console.log("Connected from tab: " + port.sender.tab.id);
-  connectNative();
+  if (!nativePort)
+    connectNative();
   port.onMessage.addListener(function(msg) {
+    // Add tab id to the message UID
+    msg.i = port.sender.tab.id + '.' + msg.i;
     console.log("received " + msg + " (tab " + port.sender.tab.id + ")");
     nativePort.postMessage(msg);
   });
 });
 
-function onNativeMessage(message) {
-  console.log("Received native message: " + JSON.stringify(message));
-  contentPort.postMessage(message);
+function onNativeMessage(msg) {
+  console.log("Received native message: " + JSON.stringify(msg));
+  // Extract tab id from identifier and restore the original correlation
+  // TODO "events are passed to active tab"
+  console.log(contentPorts);
+  let destination = msg.i.match(/(\d+)\.(.+)/);
+  let port = contentPorts.get(parseInt(destination[1]));
+  msg.i = destination[2];
+  console.log(port);
+  port.postMessage(msg);
 }
 
 function onDisconnected() {
