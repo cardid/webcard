@@ -8,14 +8,20 @@
   <link rel="stylesheet" href="style.css" > 
   <script src="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.js"></script>
 </head>
-<body class="mdc-typograpby">
+<body class="mdc-typograpby" onload="ListReaders()">
   <div class="mdc-layout-grid">
     <div class="mdc-layout-grid__inner">
-      <div class="mdc-layout-grid__cell--span-8">
+      <div class="mdc-layout-grid__cell--span-6">
         <h1 class="mdc-typography--headline3">WebCard Test</h1>
-        <button class="mdc-button mdc-button--raised" onclick="ListReaders()">List Readers</button>
+        <label class="mdc-text-field mdc-text-field--textarea">
+          <textarea class="mdc-text-field__input" aria-labelledby="my-label-id" rows="4" cols="40" id="apduList">00A4040000</textarea>
+          <div class="mdc-notched-outline">
+            <div class="mdc-notched-outline__leading"></div>
+            <div class="mdc-notched-outline__trailing"></div>
+          </div>
+        </label>
         <div>
-          <h3 class="mdc-typography--subtitle1">Available Readers</h3>
+          <h3 class="mdc-typography--headline5">Available Readers</h3>
           <ul class="mdc-list reader-list mdc-list--two-line mdc-list--avatar-list" id="readerList">
           </ul>
         </div>
@@ -51,8 +57,13 @@
 
   async function TestReader(index) {
     var atr = await _readers[index].connect(true);
-    var res = await _readers[index].transcieve("00A4040000");
-    console.log("Got this response " + res);
+    let apduList = document.getElementById('apduList').value.match(/(^[0-9A-Fa-f]+$)/gm);
+    let output = "";
+    for (let i = 0; i < apduList.length; i++) {
+      var res = await _readers[index].transcieve(apduList[i]);
+      output += '> ' + apduList[i] + '\n< ' + res + '\n';
+      document.getElementById('apduList').value = output;
+    }
     _readers[index].disconnect();
   }
 

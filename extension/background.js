@@ -19,11 +19,9 @@ function onNativeMessage(msg) {
   console.log("Received native message: " + JSON.stringify(msg));
   // Extract tab id from identifier and restore the original correlation
   // TODO "events are passed to active tab"
-  console.log(contentPorts);
   let destination = msg.i.match(/(\d+)\.(.+)/);
   let port = contentPorts.get(parseInt(destination[1]));
   msg.i = destination[2];
-  console.log(port);
   port.postMessage(msg);
 }
 
