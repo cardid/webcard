@@ -1,3 +1,4 @@
 .vs
 native/bin
 native/x64
+native/Release

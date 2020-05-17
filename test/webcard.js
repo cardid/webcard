@@ -3,31 +3,35 @@
 
 var nativeCallMap = new Map();
 
-function Reader(name, atr) {
+function Reader(index, name, atr) {
+  this.index = index;
   this.name = name;
   this.atr = atr;
   
   this.connect = function(shared) {
+    let ind = this.index;
     return new Promise(function(resolve, reject) {
       let uid = Date.now().toString(36) + Math.random().toString(36).substr(2,5);
       nativeCallMap.set(uid, {c: 2, resolve: resolve, reject: reject});
-      window.postMessage({ webcard: "request", i: uid, c: 2, r: 0, p: shared ? 2 : 1 }, "*");
+      window.postMessage({ webcard: "request", i: uid, c: 2, r: ind, p: shared ? 2 : 1 }, "*");
     });
   }
   
   this.disconnect = function() {
+    let ind = this.index;
     return new Promise(function(resolve, reject) {
       let uid = Date.now().toString(36) + Math.random().toString(36).substr(2,5);
       nativeCallMap.set(uid, {c: 3, resolve: resolve, reject: reject});
-      window.postMessage({ webcard: "request", i: uid, c: 3, r: 0 }, "*");
+      window.postMessage({ webcard: "request", i: uid, c: 3, r: ind }, "*");
     });
   }
 
   this.transcieve = function(apdu) {
+    let ind = this.index;
     return new Promise(function(resolve, reject) {
       let uid = Date.now().toString(36) + Math.random().toString(36).substr(2,5);
       nativeCallMap.set(uid, {c: 4, resolve: resolve, reject: reject});
-      window.postMessage({ webcard: "request", i: uid, c: 4, r: 0, a: apdu }, "*");  
+      window.postMessage({ webcard: "request", i: uid, c: 4, r: ind, a: apdu }, "*");  
     });
   }
 }
@@ -83,8 +87,8 @@ function WebCard() {
     switch (pending.c) {
       case 1:  // List readers 
         _readers = [];
-        msg.d.forEach(elm => {
-          var rdr = new Reader(elm.n, elm.a);
+        msg.d.forEach((elm, index) => {
+          var rdr = new Reader(index, elm.n, elm.a);
           _readers.push(rdr);
         });
         let readers = _readers;

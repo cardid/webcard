@@ -10,13 +10,13 @@ chrome.runtime.onConnect.addListener(function(port) {
   port.onMessage.addListener(function(msg) {
     // Add tab id to the message UID
     msg.i = port.sender.tab.id + '.' + msg.i;
-    console.log("received " + msg + " (tab " + port.sender.tab.id + ")");
+    console.log(">> " + JSON.stringify(msg));
     nativePort.postMessage(msg);
   });
 });
 
 function onNativeMessage(msg) {
-  console.log("Received native message: " + JSON.stringify(msg));
+  console.log("<< " + JSON.stringify(msg));
   // Extract tab id from identifier and restore the original correlation
   // TODO "events are passed to active tab"
   let destination = msg.i.match(/(\d+)\.(.+)/);

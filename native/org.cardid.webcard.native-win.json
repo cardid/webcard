@@ -1,9 +1,0 @@
-{
-  "name": "org.cardid.webcard.native",
-  "description": "WebCard Native Helper Application",
-  "path": "x64/Debug/webcard.exe",
-  "type": "stdio",
-  "allowed_origins": [
-    "chrome-extension://jgadbbjafaacpeiilgomaedddolabmkf/"
-  ]
-}

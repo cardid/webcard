@@ -7,21 +7,28 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
   <link rel="stylesheet" href="style.css" > 
   <script src="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.js"></script>
+  <script type="text/javascript" src="webcard.js"></script>
 </head>
 <body class="mdc-typograpby" onload="ListReaders()">
   <div class="mdc-layout-grid">
     <div class="mdc-layout-grid__inner">
       <div class="mdc-layout-grid__cell--span-6">
-        <h1 class="mdc-typography--headline3">WebCard Test</h1>
-        <label class="mdc-text-field mdc-text-field--textarea">
-          <textarea class="mdc-text-field__input" aria-labelledby="my-label-id" rows="4" cols="40" id="apduList">00A4040000</textarea>
-          <div class="mdc-notched-outline">
-            <div class="mdc-notched-outline__leading"></div>
-            <div class="mdc-notched-outline__trailing"></div>
-          </div>
+        <h1 class="mdc-typography--headline4">Smart cards on the Web</h1>
+        <p>WebCard enables a Web page to use locally connected smart cards. 
+          Enter some APDU commands and select a reader to test.
+        </p>
+        <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--textarea">
+          <textarea class="mdc-text-field__input webcard-apdu" aria-labelledby="my-label-id" rows="4" cols="50" id="apduList">00A4040000</textarea>
+          <span class="mdc-notched-outline">
+            <span class="mdc-notched-outline__leading"></span>
+            <span class="mdc-notched-outline__notch">
+              <span class="mdc-floating-label" id="my-label-id">Test APDUs</span>
+            </span>
+            <span class="mdc-notched-outline__trailing"></span>
+          </span>
         </label>
         <div>
-          <h3 class="mdc-typography--headline5">Available Readers</h3>
+          <h3 class="mdc-typography--headline6">Available Readers</h3>
           <ul class="mdc-list reader-list mdc-list--two-line mdc-list--avatar-list" id="readerList">
           </ul>
         </div>
@@ -29,8 +36,9 @@
     </div>
   </div>
 </body>
-<script type="text/javascript" src="webcard.js"></script>
 <script type="text/javascript">
+  const textField = new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field'));
+  
   var _readers;
 
   async function ListReaders() {

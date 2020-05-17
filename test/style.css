@@ -7,3 +7,7 @@ body {
   margin: 0;
   padding-top: 0.1px;
 }
+
+.webcard-apdu {
+  font-family: 'Consolas', monospace;
+}
