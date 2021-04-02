@@ -14,15 +14,15 @@ else
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S),Linux)
 		CCFLAGS += -D LINUX
+		PCSC_CFLAGS := $(shell pkg-config --cflags libpcsclite)
 	endif
 	ifeq ($(UNAME_S),Darwin)
 		CCFLAGS += -D OSX
+		PCSC_CFLAGS := -framework PCSC
 	endif
 endif
 
 CC := clang++
-
-PCSC_CFLAGS := -framework PCSC
 
 CXXFLAGS += $(PCSC_CFLAGS)
 
