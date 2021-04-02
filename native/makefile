@@ -15,6 +15,7 @@ else
 	ifeq ($(UNAME_S),Linux)
 		CCFLAGS += -D LINUX
 		PCSC_CFLAGS := $(shell pkg-config --cflags libpcsclite)
+		PCSC_CFLAGS += $(shell pkg-config --libs libpcsclite)
 	endif
 	ifeq ($(UNAME_S),Darwin)
 		CCFLAGS += -D OSX
