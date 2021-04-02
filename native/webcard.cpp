@@ -86,6 +86,7 @@ void InitializeReaders()
 	LONG    lRet = 0;
 	LPTSTR  pReader;
 	DWORD   cch = 0;
+	char buffer[] = "\\\\?PnP?\\Notification";
 
 	_rgReaderStates = NULL;
 	_pmszReaders = NULL;
@@ -130,7 +131,6 @@ void InitializeReaders()
 		
 #if defined(__linux__)
 		// And last for new readers, this does not exist in Mac OS
-		char buffer[] = "\\\\?PnP?\\Notification";
 		_rgConnections = (LPCONN_PARAMS)realloc((LPVOID)_rgConnections, (_cReaders + 1) * sizeof(CONN_PARAMS));
 		_rgReaderStates = (LPSCARD_READERSTATE)realloc((LPVOID)_rgReaderStates, (_cReaders + 1) * sizeof(SCARD_READERSTATE));
 		_rgReaderStates[_cReaders].szReader = buffer;
