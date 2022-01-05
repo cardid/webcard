@@ -17,12 +17,18 @@ chrome.runtime.onConnect.addListener(function(port) {
 
 function onNativeMessage(msg) {
   console.log("<< " + JSON.stringify(msg));
-  // Extract tab id from identifier and restore the original correlation
-  // TODO "events are passed to active tab"
-  let destination = msg.i.match(/(\d+)\.(.+)/);
-  let port = contentPorts.get(parseInt(destination[1]));
-  msg.i = destination[2];
-  port.postMessage(msg);
+  // Events get broadcasted to all tabs
+  if (msg.i === undefined) {
+    for (let port of contentPorts.values()) {
+      port.postMessage(msg);
+    }
+  } else {
+    // Extract tab id from identifier and restore the original correlation
+    let destination = msg.i.match(/(\d+)\.(.+)/);
+    let port = contentPorts.get(parseInt(destination[1]));
+    msg.i = destination[2];
+    port.postMessage(msg);
+  }
 }
 
 function onDisconnected() {

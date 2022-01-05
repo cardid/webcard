@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WebCard Test</title>
   <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
   <link rel="stylesheet" href="style.css" > 
-  <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
-  <script type="text/javascript" src="webcard.js"></script>
 </head>
 <body class="mdc-typograpby" onload="ListReaders()">
   <div class="mdc-layout-grid">
@@ -18,7 +19,7 @@
           Enter some APDU commands and select a reader to test.
         </p>
         <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--textarea">
-          <textarea class="mdc-text-field__input webcard-apdu" aria-labelledby="my-label-id" rows="4" cols="50" id="apduList">00A4040000</textarea>
+          <textarea class="mdc-text-field__input webcard-apdu" aria-labelledby="my-label-id" rows="4" cols="80" id="apduList">00A4040000</textarea>
           <span class="mdc-notched-outline">
             <span class="mdc-notched-outline__leading"></span>
             <span class="mdc-notched-outline__notch">
@@ -36,6 +37,8 @@
     </div>
   </div>
 </body>
+<script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+<script type="text/javascript" src="webcard.js"></script>
 <script type="text/javascript">
   new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field'));
   
@@ -64,19 +67,47 @@
   }
 
   async function TestReader(index) {
-    var atr = await _readers[index].connect(true);
+    let startTime = new Date();
+    let atr = await _readers[index].connect(true);
     let apduList = document.getElementById('apduList').value.match(/(^[0-9A-Fa-f]+$)/gm);
-    let output = "";
+    let output = 'Testing card in ' + _readers[index].name + '\n';
     for (let i = 0; i < apduList.length; i++) {
       var res = await _readers[index].transcieve(apduList[i]);
       output += '> ' + apduList[i] + '\n< ' + res + '\n';
       document.getElementById('apduList').value = output;
     }
     _readers[index].disconnect();
+    let elapsed = new Date() - startTime;
+    output += 'Total: ' + elapsed + 'ms'
+    document.getElementById('apduList').value = output;
   }
 
-  navigator.webcard.cardinserted = function(reader) {
-    console.log('this is my defined handler for ' + reader.name);
+  async function ResetPin(index) {
+    let atr = await _readers[index].connect(true);
+    let output = '';
+    let res = await _readers[index].transcieve('00A4040007A0000000791000');
+    console.log('> ' + res + '\n');
+    res = await _readers[index].transcieve('0084000000');
+    console.log('> ' + res + '\n');
+    let response = await fetch('http://localhost:3001/unblock', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({challenge: res.substr(0, res.length - 4)})
+    });
+    let data = await response.json();
+    res = await _readers[index].transcieve('0082000108' + data.response);
+    console.log('> ' + res + '\n');
+    res = await _readers[index].transcieve('002C0200083030303030303030');
+    console.log('> ' + res + '\n');
+    _readers[index].disconnect();
   }
+
+  navigator.webcard.cardInserted = function(reader) {
+    console.log('Card inserted in ' + reader.name);
+  }
+
+  navigator.webcard.cardRemoved = function(reader) {
+    console.log('Card removed from ' + reader.name)
+  } 
 </script>
 </html>

@@ -3,12 +3,12 @@
 
   "name": "Smart card extension",
   "description": "Enables a Web page to communicate with locally connected smart cards",
-  "version": "0.2.3",
+  "version": "0.2.6",
   "icons": { "16": "icon16.png",
              "48": "icon48.png",
              "128": "icon128.png" },
   "content_scripts": [{
-    "matches": ["https://*.cardid.org/*"],
+    "matches": ["https://*.cardid.org/*", "https://*.stknovak.cz/*", "http://localhost/*"],
     "js": ["content.js"],
     "run_at": "document_start"
   }],

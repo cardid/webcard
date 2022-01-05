@@ -8,6 +8,12 @@ body {
   padding-top: 0.1px;
 }
 
+textarea {
+  white-space: pre;
+  overflow-wrap: normal;
+  overflow-x: scroll;
+}
+
 .webcard-apdu {
   font-family: 'Consolas', monospace;
 }

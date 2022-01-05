@@ -13,7 +13,7 @@ function Reader(index, name, atr) {
     return new Promise(function(resolve, reject) {
       let uid = Date.now().toString(36) + Math.random().toString(36).substr(2,5);
       nativeCallMap.set(uid, {c: 2, resolve: resolve, reject: reject});
-      window.postMessage({ webcard: "request", i: uid, c: 2, r: ind, p: shared ? 2 : 1 }, "*");
+      window.postMessage({ webcard: "request", i: uid, c: 2, r: ind, p: shared ? 2 : 1 }, window.location.href);
     });
   }
   
@@ -22,7 +22,7 @@ function Reader(index, name, atr) {
     return new Promise(function(resolve, reject) {
       let uid = Date.now().toString(36) + Math.random().toString(36).substr(2,5);
       nativeCallMap.set(uid, {c: 3, resolve: resolve, reject: reject});
-      window.postMessage({ webcard: "request", i: uid, c: 3, r: ind }, "*");
+      window.postMessage({ webcard: "request", i: uid, c: 3, r: ind }, window.location.href);
     });
   }
 
@@ -31,7 +31,7 @@ function Reader(index, name, atr) {
     return new Promise(function(resolve, reject) {
       let uid = Date.now().toString(36) + Math.random().toString(36).substr(2,5);
       nativeCallMap.set(uid, {c: 4, resolve: resolve, reject: reject});
-      window.postMessage({ webcard: "request", i: uid, c: 4, r: ind, a: apdu }, "*");  
+      window.postMessage({ webcard: "request", i: uid, c: 4, r: ind, a: apdu }, window.location.href);  
     });
   }
 }
@@ -52,9 +52,9 @@ function WebCard() {
     html += 'In order to provide a better login experience, this page uses your smart card.<br \\>Please install the latest ';
 
     if (navigator.platform == "Win32")
-      html += '<a href="' + WebCard.remoteURL + '/webcard.msi">';
+      html += '<a href="https://webcard.cardid.org/webcard.msi">';
     else
-      html += '<a href="' + WebCard.remoteURL + '/webcard.dmg">';
+      html += '<a href="https://webcard.cardid.org/webcard.dmg">';
     
     html += 'Smart Card Browser Extension</a> and restart your browser.</p>';
     banner.innerHTML = html;
@@ -65,7 +65,7 @@ function WebCard() {
     return new Promise(function(resolve, reject) {
       let uid = Date.now().toString(36) + Math.random().toString(36).substr(2,5);
       nativeCallMap.set(uid, {c: 1, resolve: resolve, reject: reject});
-      window.postMessage({ webcard: "request", i: uid, c: 1 }, "*");
+      window.postMessage({ webcard: "request", i: uid, c: 1 }, window.location.href);
     });
   }
 
@@ -73,12 +73,12 @@ function WebCard() {
     if (msg.e) {
       switch(msg.e) {
         case 1: // Card inserted
-          if (navigator.webcard.cardinserted !== undefined)
-            navigator.webcard.cardinserted(_readers[msg.r]);
+          if (navigator.webcard.cardInserted !== undefined)
+            navigator.webcard.cardInserted(_readers[msg.r]);
           break;
         case 2: // Card removed
-          if (navigator.webcard.cardremoved !== undefined)
-            navigator.webcard.cardremoved(_readers[msg.r]);
+          if (navigator.webcard.cardRemoved !== undefined)
+            navigator.webcard.cardRemoved(_readers[msg.r]);
           break;
         }
       return;
@@ -91,8 +91,7 @@ function WebCard() {
           var rdr = new Reader(index, elm.n, elm.a);
           _readers.push(rdr);
         });
-        let readers = _readers;
-        pending.resolve(readers);
+        pending.resolve(_readers);
         break;
       case 2: // Connect
         if (msg.d != "")
@@ -109,8 +108,7 @@ function WebCard() {
     }
     nativeCallMap.delete(msg.i);
   }
-
-};
+}
 
 if (typeof navigator.webcard === 'undefined') {
   navigator.webcard = new WebCard();
@@ -118,7 +116,7 @@ if (typeof navigator.webcard === 'undefined') {
 
 window.addEventListener("message", function(event) {
   // We only accept messages from ourselves
-  if (event.source != window)
+  if (event.source != window || event.origin != window.location.href.replace(/\/$/, ""))
     return;
 
   if (event.data.webcard && (event.data.webcard == "response")) {

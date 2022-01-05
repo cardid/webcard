@@ -6,7 +6,7 @@ document.documentElement.appendChild(banner);
 
 window.addEventListener("message", function(event) {
   // We only accept messages from ourselves
-  if (event.source != window)
+  if (event.source != window || event.origin != window.location.href.replace(/\/$/, ""))
     return;
 
   if (event.data.webcard && (event.data.webcard == "request")) {
@@ -16,7 +16,7 @@ window.addEventListener("message", function(event) {
       port.onMessage.addListener(function(msg) {
         // Got a message from background, bubble it up to the page
         msg.webcard = 'response';
-        window.postMessage(msg, "*");
+        window.postMessage(msg, window.location.href);
       });
     }
     
