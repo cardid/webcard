@@ -47,16 +47,16 @@ function WebCard() {
     banner = document.createElement('div');
     banner.id = "webcard-install-banner";
     banner.style = "width:100%;top:0;left:0;position:fixed;"
-      + "background-color:rgba(250,250,210,0.75);border-bottom:1px solid gold;z-index:1030;"
-    var html = '<p style="margin:8pt;font:10pt Helvetica;color:black;">';
-    html += 'In order to provide a better login experience, this page uses your smart card.<br \\>Please install the latest ';
+      + "background-color:rgba(250,250,210,0.85);border-bottom:1px solid gold;z-index:1030;"
+    var html = '<p style="margin:8pt;font:11pt Helvetica;color:black;">';
+    html += 'This page needs you to install the ';
 
     if (navigator.platform == "Win32")
       html += '<a href="https://webcard.cardid.org/webcard.msi">';
     else
       html += '<a href="https://webcard.cardid.org/webcard.dmg">';
     
-    html += 'Smart Card Browser Extension</a> and restart your browser.</p>';
+    html += 'Smart Card Extension</a> to access your smart card readers.</p>';
     banner.innerHTML = html;
     document.body.appendChild(banner);
   }
@@ -116,7 +116,7 @@ if (typeof navigator.webcard === 'undefined') {
 
 window.addEventListener("message", function(event) {
   // We only accept messages from ourselves
-  if (event.source != window || event.origin != window.location.href.replace(/\/$/, ""))
+  if (!Object.is(event.source, this.window) || !window.location.href.startsWith(event.origin))
     return;
 
   if (event.data.webcard && (event.data.webcard == "response")) {

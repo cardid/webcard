@@ -8,18 +8,19 @@
   <link rel="stylesheet" href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
-  <link rel="stylesheet" href="style.css" > 
+  <link rel="stylesheet" href="style.css">
 </head>
 <body class="mdc-typograpby" onload="ListReaders()">
   <div class="mdc-layout-grid">
     <div class="mdc-layout-grid__inner">
       <div class="mdc-layout-grid__cell--span-6">
         <h1 class="mdc-typography--headline4">Smart cards on the Web</h1>
-        <p>WebCard enables a Web page to use locally connected smart cards. 
+        <p>WebCard enables a Web page to use locally connected smart cards.
           Enter some APDU commands and select a reader to test.
         </p>
         <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--textarea">
-          <textarea class="mdc-text-field__input webcard-apdu" aria-labelledby="my-label-id" rows="4" cols="80" id="apduList">00A4040000</textarea>
+          <textarea class="mdc-text-field__input webcard-apdu" aria-labelledby="my-label-id" rows="4" cols="80"
+            id="apduList">00A4040000</textarea>
           <span class="mdc-notched-outline">
             <span class="mdc-notched-outline__leading"></span>
             <span class="mdc-notched-outline__notch">
@@ -30,7 +31,7 @@
         </label>
         <div>
           <h3 class="mdc-typography--headline6">Available Readers</h3>
-          <ul class="mdc-list reader-list mdc-list--two-line mdc-list--avatar-list" id="readerList">
+          <ul class="mdc-list" id="readerList">
           </ul>
         </div>
       </div>
@@ -41,7 +42,8 @@
 <script type="text/javascript" src="webcard.js"></script>
 <script type="text/javascript">
   new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field'));
-  
+  new mdc.list.MDCList(document.querySelector('.mdc-list'));
+
   var _readers;
 
   async function ListReaders() {
@@ -55,13 +57,14 @@
       var node = document.createElement('li');
       reader_ul.append(node)
       node.outerHTML = `
-      <li class="mdc-list-item mdc-ripple-upgraded" tabindex="${index}" onclick="TestReader(${index})">
-              <span class="mdc-list-item__graphic material-icons" aria-hidden="true">inbox</span>
-              <span class="mdc-list-item__text">
-                <span class="mdc-list-item__primary-text">${reader.name}</span>
-                <span class="mdc-list-item__secondary-text">${reader.atr == "" ? "Empty" : "Card present"}</span>
-              </span>
-            </li>
+      <li class="mdc-list-item mdc-list-item--with-two-lines mdc-list-item--with-leading-icon" tabindex="${index}" onclick="TestReader(${index})">
+        <span class="mdc-list-item__ripple"></span>
+        <span class="mdc-list-item__start material-icons" aria-hidden="true">payment</span>
+        <span class="mdc-list-item__content">
+          <span class="mdc-list-item__primary-text">${reader.name}</span>
+          <span class="mdc-list-item__secondary-text">${reader.atr == "" ? "Empty" : "Card present"}</span>
+        </span>
+      </li>
       `;
     });
   }
@@ -82,31 +85,11 @@
     document.getElementById('apduList').value = output;
   }
 
-  async function ResetPin(index) {
-    let atr = await _readers[index].connect(true);
-    let output = '';
-    let res = await _readers[index].transcieve('00A4040007A0000000791000');
-    console.log('> ' + res + '\n');
-    res = await _readers[index].transcieve('0084000000');
-    console.log('> ' + res + '\n');
-    let response = await fetch('http://localhost:3001/unblock', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({challenge: res.substr(0, res.length - 4)})
-    });
-    let data = await response.json();
-    res = await _readers[index].transcieve('0082000108' + data.response);
-    console.log('> ' + res + '\n');
-    res = await _readers[index].transcieve('002C0200083030303030303030');
-    console.log('> ' + res + '\n');
-    _readers[index].disconnect();
-  }
-
-  navigator.webcard.cardInserted = function(reader) {
+  navigator.webcard.cardInserted = function (reader) {
     console.log('Card inserted in ' + reader.name);
   }
 
-  navigator.webcard.cardRemoved = function(reader) {
+  navigator.webcard.cardRemoved = function (reader) {
     console.log('Card removed from ' + reader.name)
   } 
 </script>

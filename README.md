@@ -30,8 +30,8 @@ Messages to native:
 i: unique message identifier
 c: command 1-list readers, 2-connect, 3-disconnect, 4-transcieve
 r: index of reader in reader list
-a: hex cAPDU to send to the card, sent only for c: 3
-p: parameter, share mode for connect, sent only for c: 1
+a: hex cAPDU to send to the card, sent only for c: 4
+p: parameter, share mode for connect, sent only for c: 2
 
 Messages from native:
 ```

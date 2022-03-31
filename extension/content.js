@@ -6,7 +6,7 @@ document.documentElement.appendChild(banner);
 
 window.addEventListener("message", function(event) {
   // We only accept messages from ourselves
-  if (event.source != window || event.origin != window.location.href.replace(/\/$/, ""))
+  if (!Object.is(event.source, this.window) || !window.location.href.startsWith(event.origin))
     return;
 
   if (event.data.webcard && (event.data.webcard == "request")) {

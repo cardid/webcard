@@ -1,26 +1,42 @@
-# fly.toml file generated for webcard-cardid-org on 2020-08-31T12:07:24+02:00
+# fly.toml file generated for webcard-cardid-org on 2022-01-06T14:13:02+01:00
 
 app = "webcard-cardid-org"
 
+kill_signal = "SIGINT"
+kill_timeout = 5
+processes = []
+
 [build]
   builtin = "static"
+  
+[env]
+
+[experimental]
+  allowed_public_ports = []
+  auto_rollback = true
 
 [[services]]
+  http_checks = []
   internal_port = 8080
+  processes = ["app"]
   protocol = "tcp"
+  script_checks = []
 
   [services.concurrency]
     hard_limit = 25
     soft_limit = 20
+    type = "connections"
 
   [[services.ports]]
     handlers = ["http"]
-    port = "80"
+    port = 80
 
   [[services.ports]]
     handlers = ["tls", "http"]
-    port = "443"
+    port = 443
 
   [[services.tcp_checks]]
-    interval = 10000
-    timeout = 2000
+    grace_period = "1s"
+    interval = "15s"
+    restart_limit = 0
+    timeout = "2s"
