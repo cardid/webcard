@@ -7,7 +7,7 @@
              "48": "icon48.png",
              "128": "icon128.png" },
   "content_scripts": [{
-    "matches": ["https://*.cardid.org/*", "https://*.stknovak.cz/*", "http://localhost/*"],
+    "matches": ["https://*/*", "http://localhost/*"],
     "js": ["content.js"],
     "run_at": "document_start"
   }],

@@ -1,4 +1,4 @@
-# fly.toml file generated for webcard-cardid-org on 2022-01-06T14:13:02+01:00
+# fly.toml file generated for webcard-cardid-org on 2022-03-31T12:18:37+02:00
 
 app = "webcard-cardid-org"
 
@@ -6,9 +6,6 @@ kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []
 
-[build]
-  builtin = "static"
-  
 [env]
 
 [experimental]
@@ -28,6 +25,7 @@ processes = []
     type = "connections"
 
   [[services.ports]]
+    force_https = true
     handlers = ["http"]
     port = 80
 

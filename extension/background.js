@@ -32,7 +32,7 @@ function onNativeMessage(msg) {
 }
 
 function onDisconnected() {
-  console.log("Failed to connect: " + chrome.runtime.lastError.message);
+  console.log("Native client disconnected: " + chrome.runtime.lastError.message);
   nativePort = null;
 }
 
