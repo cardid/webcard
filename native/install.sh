@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Copyright 2013 The Chromium Authors. All rights reserved.
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
@@ -6,8 +6,8 @@
 set -e
 
 DIR="$( cd "$( dirname "$0" )" && pwd )"
-if [ "$(uname -s)" == "Darwin" ]; then
-  if [ "$(whoami)" == "root" ]; then
+if [ "$(uname -s)" = "Darwin" ]; then
+  if [ "$(whoami)" = "root" ]; then
     TARGET_DIR="/Library/Google/Chrome/NativeMessagingHosts"
     EXTENSION_DIR="/Library/Application Support/Google/Chrome/External Extensions"
   else
@@ -15,7 +15,7 @@ if [ "$(uname -s)" == "Darwin" ]; then
     EXTENSION_DIR="$HOME/Library/Application Support/Google/Chrome/External Extensions"
   fi
 else
-  if [ "$(whoami)" == "root" ]; then
+  if [ "$(whoami)" = "root" ]; then
     TARGET_DIR="/etc/opt/chrome/native-messaging-hosts"
     EXTENSION_DIR="/opt/google/chrome/extensions/"
   else
