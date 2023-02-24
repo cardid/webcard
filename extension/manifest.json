@@ -2,17 +2,19 @@
   "manifest_version": 3,
   "name": "Smart Card Extension",
   "description": "Enables a Web page to communicate with locally connected smart cards",
-  "version": "0.3.0",
-  "icons": { "16": "icon16.png",
-             "48": "icon48.png",
-             "128": "icon128.png" },
+  "version": "0.4.0",
+  "icons": {
+    "16": "resources/icon16.png",
+    "48": "resources/icon48.png",
+    "128": "resources/icon128.png"
+  },
   "content_scripts": [{
-    "matches": ["https://*/*", "http://localhost/*"],
-    "js": ["content.js"],
+    "matches": ["<all_urls>"],
+    "js": ["scripts/content.js"],
     "run_at": "document_start"
   }],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "scripts/background.js"
   },
   "permissions": ["nativeMessaging"]
 }

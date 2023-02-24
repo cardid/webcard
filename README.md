@@ -1,6 +1,6 @@
 # Smart Card Browser Extension
 
-This smart card browser extension is an attempt to provide a bridge between the JavaScript world that a Web developer is familiar with and the native smart card subsystems available in PC platforms.
+This smart card browser extension is an attempt to provide a bridge between the JavaScript world that a Web developer is familiar with, and the native smart card subsystems available in desktop platforms. It works in Windows 10 and 11, macOS and Linux.
 
 The idea is that a Web developer who wants to have low level access to smart cards in the machine where the browser is running would add a `webcard.js` file to the page. That script would in turn check if the extension is installed and if not prompt the user to install it.
 
