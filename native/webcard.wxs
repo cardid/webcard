@@ -1,15 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="98A81D16-A6DE-42D0-9DDD-A5AF3FB9BC47" UpgradeCode="747490FD-8FA6-4F8A-BFE2-ABA1FDD334C4" 
-    Name="Smart Card Browser Extension" Manufacturer="CardID.org" Language="1033" Version="0.2.1">
-    <Package Id="*" Description="WebCard 0.2 Installer" Manufacturer="CardID.org"
-      InstallerVersion="100" Languages="1033" Compressed="yes" InstallScope="perUser" />
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package 
+    UpgradeCode="747490FD-8FA6-4F8A-BFE2-ABA1FDD334C4" 
+    Name="Smart Card Browser Extension" 
+    Manufacturer="CardID.org"
+    Language="1033" 
+    Version="0.4.0" 
+    InstallerVersion="100" 
+    Scope="perUser" 
+    ProductCode="98A81D16-A6DE-42D0-9DDD-A5AF3FB9BC47">
+	  <SummaryInformation Description="WebCard 0.4 native helper" Manufacturer="CardID.org" />
     <Upgrade Id="747490FD-8FA6-4F8A-BFE2-ABA1FDD334C4">
-      <UpgradeVersion
-        Property="OLD_VERSION_FOUND"
+      <UpgradeVersion 
+        Property="OLD_VERSION_FOUND" 
         Minimum="0.0.1" IncludeMinimum="yes"
-        Maximum="0.2.0" IncludeMaximum="yes"
-        OnlyDetect="no" IgnoreRemoveFailure="yes"
+        Maximum="0.4.0" IncludeMaximum="no" 
+        OnlyDetect="no" IgnoreRemoveFailure="yes" 
         MigrateFeatures="yes" />
     </Upgrade>
     <InstallExecuteSequence>
@@ -17,35 +22,6 @@
       <InstallExecute After="RemoveExistingProducts" />
     </InstallExecuteSequence>
     <Media Id="1" Cabinet="webcard.cab" EmbedCab="yes" />
-
-    <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="AppDataFolder" Name="AppData">
-        <Directory Id="CardID" Name="CardID">
-          <Component Id="CardIDDir" Guid="*">
-            <RemoveFolder Id="RemoveCardID" On="uninstall"/>
-            <RegistryValue Root="HKCU" Key="Software\CardID" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
-          </Component>
-          <Directory Id="INSTALLDIR" Name="WebCard">
-            <Component Id="NativeHelper" Guid="5F761B19-D286-4487-A94C-95A541282209">
-              <File Id="WebcardEXE" Name="webcard.exe" DiskId="1" Source=".\Release\webcard.exe" />
-              <RemoveFolder Id="RemoveWebCard" On="uninstall"/>
-              <RegistryValue Root="HKCU" Key="Software\CardID\WebCard" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
-            </Component>
-            <Component Id="NativeHostConf" Guid="EBC3A463-0D7E-4BB1-9367-EC1CD4525A7A">
-              <File Id="WebcardJSON" Name="org.cardid.webcard.json" DiskId="1" Source="org.cardid.webcard.json" />
-              <RegistryKey Id="WebcardJsonReg" Root="HKCU" Key="Software\Google\Chrome\NativeMessagingHosts\org.cardid.webcard" ForceDeleteOnUninstall="yes">
-                <RegistryValue Type="string" Value="[INSTALLDIR]\org.cardid.webcard.json" KeyPath="yes" />
-              </RegistryKey>
-            </Component>
-            <Component Id="Extension" Guid="6CAF97B8-0D33-4BA4-98ED-80E920BB3026">
-              <RegistryKey Id="ExtensionReg" Root="HKCU" Key="Software\Google\Chrome\Extensions\icpgdjoejngfekheifhhaceealdnipfb" ForceDeleteOnUninstall="yes">
-                <RegistryValue Type="string" Name="update_url" Value="https://clients2.google.com/service/update2/crx" KeyPath="yes" />
-              </RegistryKey>
-            </Component>
-          </Directory>
-        </Directory>
-      </Directory>
-    </Directory>
 
     <Feature Id="Complete" Title="WebCard Helper" Level="1">
       <ComponentRef Id="CardIDDir" />
@@ -56,5 +32,32 @@
 
     <Icon Id="webcard.ico" SourceFile="webcard.ico" />
     <Property Id="ARPPRODUCTICON" Value="webcard.ico" />
-  </Product>
+  
+    <StandardDirectory Id="AppDataFolder">
+      <Directory Id="CardID" Name="CardID">
+        <Component Id="CardIDDir">
+          <RemoveFolder Id="RemoveCardID" On="uninstall" />
+          <RegistryValue Root="HKCU" Key="Software\CardID" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+        </Component>
+        <Directory Id="INSTALLDIR" Name="WebCard">
+          <Component Id="NativeHelper" Guid="5F761B19-D286-4487-A94C-95A541282209">
+            <File Id="WebcardEXE" Name="webcard.exe" DiskId="1" Source=".\Release\webcard.exe" />
+            <RemoveFolder Id="RemoveWebCard" On="uninstall" />
+            <RegistryValue Root="HKCU" Key="Software\CardID\WebCard" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+          </Component>
+          <Component Id="NativeHostConf" Guid="EBC3A463-0D7E-4BB1-9367-EC1CD4525A7A">
+            <File Id="WebcardJSON" Name="org.cardid.webcard.native.json" DiskId="1" Source="org.cardid.webcard.native.json" />
+            <RegistryKey Id="WebcardJsonReg" Root="HKCU" Key="Software\Google\Chrome\NativeMessagingHosts\org.cardid.webcard.native" ForceDeleteOnUninstall="yes">
+              <RegistryValue Type="string" Value="[INSTALLDIR]\org.cardid.webcard.native.json" KeyPath="yes" />
+            </RegistryKey>
+          </Component>
+          <Component Id="Extension" Guid="6CAF97B8-0D33-4BA4-98ED-80E920BB3026">
+            <RegistryKey Id="ExtensionReg" Root="HKCU" Key="Software\Google\Chrome\Extensions\icpgdjoejngfekheifhhaceealdnipfb" ForceDeleteOnUninstall="yes">
+              <RegistryValue Type="string" Name="update_url" Value="https://clients2.google.com/service/update2/crx" KeyPath="yes" />
+            </RegistryKey>
+          </Component>
+        </Directory>
+      </Directory>
+    </StandardDirectory>
+  </Package>
 </Wix>

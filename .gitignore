@@ -1,5 +1,5 @@
 **/.DS_Store
-.vs
-native/bin
-native/x64
-native/Release
+**/.vs
+**/.vscode
+native/out/
+native/bin/

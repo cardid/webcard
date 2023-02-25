@@ -25,7 +25,7 @@ else
 fi
 
 HOST_NAME=org.cardid.webcard.native
-EXTENSION_ID="mnfaoaojdjchapbhjjcofeojlnpofeam"
+EXTENSION_ID="icpgdjoejngfekheifhhaceealdnipfb"
 # Create directory to store native messaging host.
 mkdir -p "$TARGET_DIR"
 mkdir -p "$EXTENSION_DIR"
