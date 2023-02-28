@@ -53,10 +53,6 @@
         // Remember all pending JavaScript Promises.
         self.pendingRequests = new Map();
 
-        // Assigns random UID for each sent command.
-        self.randomUid = () =>
-            Date.now().toString(36) + Math.random().toString(36).substring(2, 7);
-
         // Command-sending wrapper method.
         self.send = (cmdIdx, otherParams) =>
         {
@@ -68,7 +64,7 @@
 
             return new Promise((resolve, reject) =>
             {
-                let uid = self.randomUid();
+                let uid = window.crypto.randomUUID();
 
                 self.pendingRequests.set(
                     uid,
