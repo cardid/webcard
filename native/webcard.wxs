@@ -26,8 +26,10 @@
     <Feature Id="Complete" Title="WebCard Helper" Level="1">
       <ComponentRef Id="CardIDDir" />
       <ComponentRef Id="NativeHelper" />
-      <ComponentRef Id="NativeHostConf" />
-      <ComponentRef Id="Extension" />
+      <ComponentRef Id="ChromeNativeHostConf" />
+      <ComponentRef Id="ChromeExtension" />
+      <ComponentRef Id="EdgeNativeHostConf" />
+      <ComponentRef Id="EdgeExtension" />
     </Feature>
 
     <Icon Id="webcard.ico" SourceFile="webcard.ico" />
@@ -45,15 +47,25 @@
             <RemoveFolder Id="RemoveWebCard" On="uninstall" />
             <RegistryValue Root="HKCU" Key="Software\CardID\WebCard" Name="installed" Type="integer" Value="1" KeyPath="yes" />
           </Component>
-          <Component Id="NativeHostConf" Guid="EBC3A463-0D7E-4BB1-9367-EC1CD4525A7A">
-            <File Id="WebcardJSON" Name="org.cardid.webcard.native.json" DiskId="1" Source="org.cardid.webcard.native.json" />
-            <RegistryKey Id="WebcardJsonReg" Root="HKCU" Key="Software\Google\Chrome\NativeMessagingHosts\org.cardid.webcard.native" ForceDeleteOnUninstall="yes">
+          <Component Id="ChromeNativeHostConf" Guid="EBC3A463-0D7E-4BB1-9367-EC1CD4525A7A">
+            <File Id="ChromeWebcardJSON" Name="org.cardid.webcard.native.json" DiskId="1" Source="org.cardid.webcard.native.json" />
+            <RegistryKey Id="ChromeWebcardJsonReg" Root="HKCU" Key="Software\Google\Chrome\NativeMessagingHosts\org.cardid.webcard.native" ForceDeleteOnUninstall="yes">
               <RegistryValue Type="string" Value="[INSTALLDIR]\org.cardid.webcard.native.json" KeyPath="yes" />
             </RegistryKey>
           </Component>
-          <Component Id="Extension" Guid="6CAF97B8-0D33-4BA4-98ED-80E920BB3026">
-            <RegistryKey Id="ExtensionReg" Root="HKCU" Key="Software\Google\Chrome\Extensions\icpgdjoejngfekheifhhaceealdnipfb" ForceDeleteOnUninstall="yes">
+          <Component Id="ChromeExtension" Guid="6CAF97B8-0D33-4BA4-98ED-80E920BB3026">
+            <RegistryKey Id="ChromeExtensionReg" Root="HKCU" Key="Software\Google\Chrome\Extensions\icpgdjoejngfekheifhhaceealdnipfb" ForceDeleteOnUninstall="yes">
               <RegistryValue Type="string" Name="update_url" Value="https://clients2.google.com/service/update2/crx" KeyPath="yes" />
+            </RegistryKey>
+          </Component>
+          <Component Id="EdgeNativeHostConf" Guid="84D02015-C4BF-4F5E-8ED0-209EB5AA5CB9">
+            <RegistryKey Id="EdgeWebcardJsonReg" Root="HKCU" Key="Software\Microsoft\Edge\NativeMessagingHosts\org.cardid.webcard.native" ForceDeleteOnUninstall="yes">
+              <RegistryValue Type="string" Value="[INSTALLDIR]\org.cardid.webcard.native.json" KeyPath="yes" />
+            </RegistryKey>
+          </Component>
+          <Component Id="EdgeExtension" Guid="28B8D037-E75C-41E0-AD9D-A1764C6EF982">
+            <RegistryKey Id="EdgeExtensionReg" Root="HKCU" Key="Software\Microsoft\Edge\Extensions\gfahiodabpingeopmhmnlilmbalpokoa" ForceDeleteOnUninstall="yes">
+              <RegistryValue Type="string" Name="update_url" Value="https://edge.microsoft.com/extensionwebstorebase/v1/crx" KeyPath="yes" />
             </RegistryKey>
           </Component>
         </Directory>

@@ -1,125 +1,346 @@
-// webcard.js
+/******************************************************************************/
+// "webcard.js"
 'use strict';
 
-var nativeCallMap = new Map();
+// IIFE BEGIN
+(() =>
+{
+    const WEBCARD_VERSION = '0.4.0';
+    const WEBCARD_HOMEPAGE = 'https://webcard.cardid.org';
 
-function Reader(index, name, atr) {
-  this.index = index;
-  this.name = name;
-  this.atr = atr;
-  
-  this.connect = function(shared) {
-    let ind = this.index;
-    return new Promise(function(resolve, reject) {
-      let uid = Date.now().toString(36) + Math.random().toString(36).substr(2,5);
-      nativeCallMap.set(uid, {c: 2, resolve: resolve, reject: reject});
-      window.postMessage({ webcard: "request", i: uid, c: 2, r: ind, p: shared ? 2 : 1 }, window.location.href);
-    });
-  }
-  
-  this.disconnect = function() {
-    let ind = this.index;
-    return new Promise(function(resolve, reject) {
-      let uid = Date.now().toString(36) + Math.random().toString(36).substr(2,5);
-      nativeCallMap.set(uid, {c: 3, resolve: resolve, reject: reject});
-      window.postMessage({ webcard: "request", i: uid, c: 3, r: ind }, window.location.href);
-    });
-  }
+    /**************************************************************************/
+    // `Reader` class.
+    function Reader(index, name, atr)
+    {
+        let self = this;
 
-  this.transcieve = function(apdu) {
-    let ind = this.index;
-    return new Promise(function(resolve, reject) {
-      let uid = Date.now().toString(36) + Math.random().toString(36).substr(2,5);
-      nativeCallMap.set(uid, {c: 4, resolve: resolve, reject: reject});
-      window.postMessage({ webcard: "request", i: uid, c: 4, r: ind, a: apdu }, window.location.href);  
-    });
-  }
-}
+        self.index     = index;
+        self.name      = name;
+        self.atr       = atr;
+        self.connected = undefined;
 
-function WebCard() {
-  console.log('Starting WebCard');
-  var _readers;
+        self.connect = (shared) =>
+            navigator.webcard.send(2, { r: self.index, p: shared ? 2 : 1 });
 
-  var banner = document.getElementById('webcard-install-banner');
+        self.disconnect = () =>
+            navigator.webcard.send(3, { r: self.index });
 
-  if (banner == null)
-  {
-    banner = document.createElement('div');
-    banner.id = "webcard-install-banner";
-    banner.style = "width:100%;top:0;left:0;position:fixed;"
-      + "background-color:rgba(250,250,210,0.85);border-bottom:1px solid gold;z-index:1030;"
-    var html = '<p style="margin:8pt;font:11pt Helvetica;color:black;">';
-    html += 'This page needs you to install the ';
+        self.transceive = (apdu) =>
+            navigator.webcard.send(4, { r: self.index, a: apdu });
+    }
 
-    if (navigator.platform == "Win32")
-      html += '<a href="https://webcard.cardid.org/webcard.msi">';
-    else
-      html += '<a href="https://webcard.cardid.org/webcard.dmg">';
-    
-    html += 'Smart Card Extension</a> to access your smart card readers.</p>';
-    banner.innerHTML = html;
-    document.body.appendChild(banner);
-  }
+    /**************************************************************************/
+    // `WebCard` class.
+    function WebCard()
+    {
+        let self = this;
+        let _readerList;
 
-  this.readers = function() {
-    return new Promise(function(resolve, reject) {
-      let uid = Date.now().toString(36) + Math.random().toString(36).substr(2,5);
-      nativeCallMap.set(uid, {c: 1, resolve: resolve, reject: reject});
-      window.postMessage({ webcard: "request", i: uid, c: 1 }, window.location.href);
-    });
-  }
+        console.info('Starting WebCard...');
 
-  this.response = function(msg) {
-    if (msg.e) {
-      switch(msg.e) {
-        case 1: // Card inserted
-          if (navigator.webcard.cardInserted !== undefined)
-            navigator.webcard.cardInserted(_readers[msg.r]);
-          break;
-        case 2: // Card removed
-          if (navigator.webcard.cardRemoved !== undefined)
-            navigator.webcard.cardRemoved(_readers[msg.r]);
-          break;
+        // Install check.
+        self.isReady = (null != document.getElementById('webcard-install-banner'));
+
+        if (navigator.userAgent.includes('Windows NT'))
+        {
+            self.installerUrl = `${WEBCARD_HOMEPAGE}/webcard.msi`;
         }
-      return;
-    }
-    var pending = nativeCallMap.get(msg.i);
-    switch (pending.c) {
-      case 1:  // List readers 
-        _readers = [];
-        msg.d.forEach((elm, index) => {
-          var rdr = new Reader(index, elm.n, elm.a);
-          _readers.push(rdr);
-        });
-        pending.resolve(_readers);
-        break;
-      case 2: // Connect
-        if (msg.d != "")
-          pending.resolve(msg.d);
         else
-          pending.reject();
-        break;
-      case 3: // Disconnect
-        pending.resolve();
-        break;
-      case 4: // Transcieve
-        pending.resolve(msg.d);
-        break;
+        {
+            self.installerUrl = `${WEBCARD_HOMEPAGE}/webcard.dmg`;
+        }
+
+        // Remember all pending JavaScript Promises.
+        self.pendingRequests = new Map();
+
+        // Assigns random UID for each sent command.
+        self.randomUid = () =>
+            Date.now().toString(36) + Math.random().toString(36).substring(2, 7);
+
+        // Command-sending wrapper method.
+        self.send = (cmdIdx, otherParams) =>
+        {
+            if (!self.isReady)
+            {
+                return new Promise((_, reject) =>
+                    reject());
+            }
+
+            return new Promise((resolve, reject) =>
+            {
+                let uid = self.randomUid();
+
+                self.pendingRequests.set(
+                    uid,
+                    { c: cmdIdx, resolve: resolve, reject: reject });
+
+                try
+                {
+                    window.postMessage(
+                        {
+                            webcard: 'request',
+                            i: uid,
+                            c: cmdIdx,
+                            ...otherParams
+                        },
+                        window.location.origin);
+                }
+                catch (error)
+                {
+                    self.pendingRequests.delete(uid);
+                    reject();
+                }
+            });
+        }
+
+        // Command-sending wrapper method.
+        self.sendEx = (cmdIdx, otherParams) =>
+        {
+            if (!self.isReady)
+            {
+                let promiseWrapper = () =>
+                    new Promise((_, reject) =>
+                        reject());
+
+                return {promise: promiseWrapper(), uid: undefined};
+            }
+
+            let uid = self.randomUid();
+
+            let promiseWrapper = () =>
+                new Promise((resolve, reject) =>
+                {
+                    self.pendingRequests.set(
+                        uid,
+                        { c: cmdIdx, resolve: resolve, reject: reject });
+
+                    try
+                    {
+                        window.postMessage(
+                            {
+                                webcard: 'request',
+                                i: uid,
+                                c: cmdIdx,
+                                ...otherParams
+                            },
+                            window.location.origin);
+                    }
+                    catch (error)
+                    {
+                        self.pendingRequests.delete(uid);
+                        reject();
+                    }
+                });
+
+            return {promise: promiseWrapper(), uid: uid};
+        }
+
+        // Is the latest version of WebCard installed?
+        self.getVersions = async() =>
+        {
+            // Timeout for 2 seconds.
+            const timeout = () =>
+                new Promise((resolve, _) =>
+                    setTimeout(() => resolve(), 2000));
+
+            let pendingVersionCheck;
+
+            // [Get Version] command supported only since "WebCard 0.4.0".
+            const checkVersion = () =>
+            {
+                pendingVersionCheck = self.sendEx(10);
+                return pendingVersionCheck.promise;
+            }
+
+            // Promises are rejected if the extension is not installed,
+            // or the Native App has not been found / was disconnected.
+            const versions = await Promise.race([timeout(), checkVersion()])
+                .then(msg => [msg?.verExt ?? '?', msg?.verNat ?? '?'])
+                .catch(() => ['EXTENSION DISABLED', 'EXTENSION DISABLED']);
+
+            // In case of timeout, remove the [Get version] request.
+            if ((typeof pendingVersionCheck !== 'undefined') &&
+                (typeof pendingVersionCheck.uid !== 'undefined'))
+            {
+                self.pendingRequests.delete(pendingVersionCheck.uid);
+            }
+
+            return {
+                addon: versions[0],
+                app: versions[1],
+                latest: WEBCARD_VERSION
+            };
+        }
+
+        // Fetches list of SmartCard readers connected to the PC.
+        self.readers = () =>
+            self.send(1);
+
+        // Handling content script (Native App) responses.
+        self.responseCallback = (msg) =>
+        {
+            if (typeof msg !== 'object')
+            {
+                return;
+            }
+
+            if (msg.e)
+            {
+                switch (msg.e)
+                {
+                    // [Reject any pending promises]
+                    case (-1):
+                    {
+                        self.pendingRequests.forEach((request) =>
+                        {
+                            request.reject();
+                        });
+
+                        self.pendingRequests.clear();
+
+                        break;
+                    }
+
+                    // [Card inserted]
+                    case 1:
+                    {
+                        _readerList[msg.r].atr = msg.d;
+                        self.cardInserted?.(_readerList[msg.r]);
+                        break;
+                    }
+
+                    // [Card removed]
+                    case 2:
+                    {
+                        self.cardRemoved?.(_readerList[msg.r]);
+                        break;
+                    }
+
+                    // [New readers connected]
+                    case 3:
+                    {
+                        self.readersConnected?.(msg.n);
+                        break;
+                    }
+
+                    // [Any reader unplugged]
+                    case 4:
+                    {
+                        self.readersDisconnected?.(msg.n);
+                        break;
+                    }
+                }
+
+                return;
+            }
+
+            if (!msg.i)
+            {
+                // Impossible to resolve!
+                return;
+            }
+
+            let request = self.pendingRequests.get(msg.i);
+            if (!request)
+            {
+                // No match for given UID!
+                return;
+            }
+
+            if (msg.incomplete)
+            {
+                // Response marked as incomplete
+                // (error on the Native App's side).
+                request.reject();
+            }
+            else switch (request.c)
+            {
+                // [List readers]
+                case 1:
+                {
+                    if (msg.d)
+                    {
+                        _readerList = [];
+
+                        msg.d.forEach((element, index) =>
+                        {
+                            _readerList.push(
+                                new Reader(index, element.n, element.a));
+                        });
+
+                        request.resolve(_readerList);
+                    }
+                    else
+                    {
+                        request.reject();
+                    }
+
+                    break;
+                }
+
+                // [Connect] and [Transceive]
+                case 2: case 4:
+                {
+                    if (msg.d)
+                    {
+                        request.resolve(msg.d);
+                    }
+                    else
+                    {
+                        request.reject();
+                    }
+
+                    break;
+                }
+
+                // [Get Version]
+                case 10:
+                {
+                    request.resolve(msg);
+                    break;
+                }
+
+                // [Disconnect] or an unknown command (possibly just a ping)
+                default:
+                {
+                    request.resolve();
+                }
+            }
+
+            self.pendingRequests.delete(msg.i);
+        }
+    };
+
+    /**************************************************************************/
+    // Called after any `window.postMessage()`
+    // (originating either from the content script or the page scripts).
+    function windowMessageCallback(event)
+    {
+        // We want to only accept messages from ourselves
+        // (content script => page script).
+        if ((event.source !== window) ||
+            (event.origin !== window.location.origin) ||
+            (typeof event?.data?.webcard !== 'string'))
+        {
+            return;
+        }
+
+        if (event.data.webcard === 'response')
+        {
+            navigator.webcard.responseCallback(event.data);
+        }
     }
-    nativeCallMap.delete(msg.i);
-  }
-}
 
-if (typeof navigator.webcard === 'undefined') {
-  navigator.webcard = new WebCard();
-}
+    window.addEventListener('message', windowMessageCallback, false);
 
-window.addEventListener("message", function(event) {
-  // We only accept messages from ourselves
-  if (!Object.is(event.source, this.window) || !window.location.href.startsWith(event.origin))
-    return;
+    /**************************************************************************/
+    // WebCard initialization.
+    if (typeof navigator.webcard === 'undefined')
+    {
+        navigator.webcard = new WebCard();
+    }
 
-  if (event.data.webcard && (event.data.webcard == "response")) {
-    navigator.webcard.response(event.data);
-  }
-}, false);
+// IIFE END
+})();
+
+/******************************************************************************/
