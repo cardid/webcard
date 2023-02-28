@@ -5,27 +5,37 @@
 
 set -e
 
-EXTENSION_ID="icpgdjoejngfekheifhhaceealdnipfb"
 if [ "$(uname -s)" == "Darwin" ]; then
   if [ "$(whoami)" == "root" ]; then
-    TARGET_DIR="/Library/Google/Chrome/NativeMessagingHosts"
-    EXTENSION_DIR="/Library/Application Support/Google/Chrome/External Extensions"
+    CHROME_TARGET_DIR="/Library/Google/Chrome/NativeMessagingHosts"
+    CHROME_EXTENSION_DIR="/Library/Application Support/Google/Chrome/External Extensions"
+    EDGE_TARGET_DIR="/Library/Microsoft/Edge/NativeMessagingHosts"
+    EDGE_EXTENSION_DIR="/Library/Application Support/Microsoft/Edge/External Extensions"
   else
-    TARGET_DIR="$HOME/Library/Application Support/Google/Chrome/NativeMessagingHosts"
-    EXTENSION_DIR="$HOME/Library/Application Support/Google/Chrome/External Extensions"
+    CHROME_TARGET_DIR="$HOME/Library/Application Support/Google/Chrome/NativeMessagingHosts"
+    CHROME_EXTENSION_DIR="$HOME/Library/Application Support/Google/Chrome/External Extensions"
+    EDGE_TARGET_DIR="$HOME/Library/Application Support/Microsoft Edge/NativeMessagingHosts"
+    EDGE_EXTENSION_DIR="$HOME/Library/Application Support/Microsoft Edge/External Extensions"
   fi
 else
   if [ "$(whoami)" == "root" ]; then
-    TARGET_DIR="/etc/opt/chrome/native-messaging-hosts"
-    EXTENSION_DIR="/opt/google/chrome/extensions/"
+    CHROME_TARGET_DIR="/etc/opt/chrome/native-messaging-hosts"
+    CHROME_EXTENSION_DIR="/opt/google/chrome/extensions/"
+    EDGE_TARGET_DIR="/etc/opt/edge/native-messaging-hosts"
+    EDGE_EXTENSION_DIR="/usr/share/microsoft-edge/extensions/"
   else
-    TARGET_DIR="$HOME/.config/google-chrome/NativeMessagingHosts"
-    EXTENSION_DIR="/usr/share/google-chrome/extensions/"
+    CHROME_TARGET_DIR="$HOME/.config/google-chrome/NativeMessagingHosts"
+    CHROME_EXTENSION_DIR="/usr/share/google-chrome/extensions/"
+    EDGE_TARGET_DIR="$HOME/.config/microsoft-edge/NativeMessagingHosts"
+    EDGE_EXTENSION_DIR="/.config/microsoft-edge/External Extensions/"
   fi
 fi
 
 HOST_NAME=org.cardid.webcard.native
-EXTENSION_ID="icpgdjoejngfekheifhhaceealdnipfb"
-rm "$TARGET_DIR/$HOST_NAME.json"
-rm "$EXTENSION_DIR/$EXTENSION_ID.json"
+CHROME_EXTENSION_ID="icpgdjoejngfekheifhhaceealdnipfb"
+EDGE_EXTENSION_ID="gfahiodabpingeopmhmnlilmbalpokoa"
+rm "$CHROME_TARGET_DIR/$HOST_NAME.json"
+rm "$CHROME_EXTENSION_DIR/$CHROME_EXTENSION_ID.json"
+rm "$EDGE_TARGET_DIR/$HOST_NAME.json"
+rm "$EDGE_EXTENSION_DIR/$EDGE_EXTENSION_ID.json"
 echo "Native messaging helper $HOST_NAME has been uninstalled."
