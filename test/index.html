@@ -13,6 +13,7 @@
 <body class="mdc-typograpby" onload="ListReaders()">
   <div class="mdc-layout-grid">
     <div class="mdc-layout-grid__inner">
+      <div class="mdc-layout-grid__cell--span-3"></div>
       <div class="mdc-layout-grid__cell--span-6">
         <h1 class="mdc-typography--headline4">Smart cards on the Web</h1>
         <p>WebCard enables a Web page to use locally connected smart cards.
@@ -20,7 +21,7 @@
         </p>
         <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--textarea">
           <textarea class="mdc-text-field__input webcard-apdu" aria-labelledby="my-label-id" rows="4" cols="80"
-            id="apduList">00A4040000</textarea>
+            id="apduList" onfocus="showInput()" onblur="showTrace()">FFCA000000&#13;00A4040000</textarea>
           <span class="mdc-notched-outline">
             <span class="mdc-notched-outline__leading"></span>
             <span class="mdc-notched-outline__notch">
@@ -31,10 +32,11 @@
         </label>
         <div>
           <h3 class="mdc-typography--headline6">Available Readers</h3>
-          <ul class="mdc-list" id="readerList">
+          <ul class="mdc-deprecated-list mdc-deprecated-list--two-line" id="readerList">
           </ul>
         </div>
       </div>
+      <div class="mdc-layout-grid__cell--span-3"></div>
     </div>
   </div>
 </body>
@@ -42,7 +44,10 @@
 <script type="text/javascript" src="webcard.js"></script>
 <script type="text/javascript">
   new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field'));
-  new mdc.list.MDCList(document.querySelector('.mdc-list'));
+  const list = new mdc.list.MDCList(document.querySelector('.mdc-deprecated-list'));
+  const listItemRipples = list.listElements.map((elmX) => new MDCRipple(elmX));
+  let lastInput = "FFCA000000\n00A4040000";
+  let lastTrace = "FFCA000000\n00A4040000";
 
   var _readers;
 
@@ -57,12 +62,12 @@
       var node = document.createElement('li');
       reader_ul.append(node)
       node.outerHTML = `
-      <li class="mdc-list-item mdc-list-item--with-two-lines mdc-list-item--with-leading-icon" tabindex="${index}" onclick="TestReader(${index})">
-        <span class="mdc-list-item__ripple"></span>
-        <span class="mdc-list-item__start material-icons" aria-hidden="true">payment</span>
-        <span class="mdc-list-item__content">
-          <span class="mdc-list-item__primary-text">${reader.name}</span>
-          <span class="mdc-list-item__secondary-text">${reader.atr == "" ? "Empty" : "Card present"}</span>
+      <li class="mdc-deprecated-list-item" tabindex="${index}" onclick="TestReader(${index})">
+        <span class="mdc-deprecated-list-item__ripple"></span>
+        <span class="mdc-deprecated-list-item__graphic material-icons" aria-hidden="true">payment</span>
+        <span class="mdc-deprecated-list-item__text">
+          <span class="mdc-deprecated-list-item__primary-text">${reader.name}</span>
+          <span class="mdc-deprecated-list-item__secondary-text">${reader.atr == "" ? "Empty" : "Card present"}</span>
         </span>
       </li>
       `;
@@ -84,6 +89,16 @@
     let elapsed = new Date() - startTime;
     output += 'Total: ' + elapsed + 'ms'
     document.getElementById('apduList').value = output;
+  }
+
+  function showInput() {
+    lastTrace = document.getElementById('apduList').value;
+    document.getElementById('apduList').value = lastInput;
+  }
+
+  function showTrace() {
+    lastInput = document.getElementById('apduList').value;
+    document.getElementById('apduList').value = lastTrace;
   }
 
   navigator.webcard.cardInserted = function (reader) {

@@ -46,7 +46,7 @@ cp "$DIR/$HOST_NAME.json" "$CHROME_TARGET_DIR"
 cp "$DIR/$HOST_NAME.json" "$EDGE_TARGET_DIR"
 
 # Update host path in the manifest.
-HOST_PATH=$DIR/bin/webcard
+HOST_PATH=$DIR/out/webcard
 ESCAPED_HOST_PATH=${HOST_PATH////\\/}
 sed -i -e "s/HOST_PATH/$ESCAPED_HOST_PATH/" "$CHROME_TARGET_DIR/$HOST_NAME.json"
 sed -i -e "s/HOST_PATH/$ESCAPED_HOST_PATH/" "$EDGE_TARGET_DIR/$HOST_NAME.json"

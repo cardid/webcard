@@ -1,6 +1,5 @@
 **/.DS_Store
 **/.vs
 **/.vscode
-**/.msi
+*.msi
 native/out/
-native/bin/

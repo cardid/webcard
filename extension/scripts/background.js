@@ -44,9 +44,15 @@ function nativePortCallback(msg)
     {
         // Message originating from the [Native App].
         // Broadcast to all content ports.
-        contentPorts.forEach((port) =>
+        contentPorts.forEach((port, senderId) =>
         {
-            port.postMessage(msg);
+            try {
+                port.postMessage(msg);
+            } catch (error) {
+                // Assuming the givent content port is disconnected:
+                // "Error: Attempting to use a disconnected port object"
+                contentPorts.delete(senderId)``
+            }
         });
     }
 }
