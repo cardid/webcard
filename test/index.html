@@ -78,7 +78,7 @@
     let startTime = new Date();
     let atr = await _readers[index].connect(true);
     console.log('connected ' + atr);
-    let apduList = document.getElementById('apduList').value.match(/(^[0-9A-Fa-f]+$)/gm);
+    let apduList = lastInput.match(/(^[0-9A-Fa-f]+$)/gm);
     let output = 'Testing card in ' + _readers[index].name + '\n';
     for (let i = 0; i < apduList.length; i++) {
       var res = await _readers[index].transceive(apduList[i]);
