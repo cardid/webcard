@@ -50,6 +50,23 @@
             self.installerUrl = `${WEBCARD_HOMEPAGE}/webcard.dmg`;
         }
 
+        if (!self.isReady)
+        {
+          let banner = document.createElement('div');
+          banner.id = "webcard-install-banner";
+          banner.style = "width:100%;top:0;left:0;position:fixed;"
+            + "background-color:rgba(250,250,210,0.85);border-bottom:1px solid gold;z-index:1030;"
+          banner.innerHTML = `
+            <p style="margin:8pt;font:11pt Helvetica;color:black;">
+              This page needs you to install the 
+              <a href="${self.installerUrl}">Smart Card Extension</a>
+              to access your smart card readers.
+            </p>
+          `;
+          document.body.appendChild(banner);
+          console.log('added banner');
+        }
+
         // Remember all pending JavaScript Promises.
         self.pendingRequests = new Map();
 
