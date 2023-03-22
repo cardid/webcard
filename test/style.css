@@ -17,3 +17,8 @@ textarea {
 .webcard-apdu {
   font-family: 'Consolas', monospace;
 }
+
+.ghbtns {
+  display: flex;
+  justify-content: right;
+}

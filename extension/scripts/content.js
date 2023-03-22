@@ -67,15 +67,3 @@ function windowMessageCallback(event)
 window.addEventListener('message', windowMessageCallback, false);
 
 /******************************************************************************/
-// Called when user closes the tab associated with this content script.
-function windowUnloadCallback()
-{
-    if (backgroundPort)
-    {
-        backgroundPort.postMessage(undefined);
-    }
-}
-
-window.addEventListener('unload', windowUnloadCallback, false);
-
-/******************************************************************************/

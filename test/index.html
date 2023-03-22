@@ -10,18 +10,31 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
   <link rel="stylesheet" href="style.css">
 </head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZMNXYYFSNB"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-ZMNXYYFSNB');
+</script>
 <body class="mdc-typograpby" onload="ListReaders()">
   <div class="mdc-layout-grid">
     <div class="mdc-layout-grid__inner">
       <div class="mdc-layout-grid__cell--span-3"></div>
       <div class="mdc-layout-grid__cell--span-6">
+        <div class="ghbtns">
+          <iframe src="https://ghbtns.com/github-btn.html?user=cardid&repo=webcard&type=star&count=true&size=large" frameborder="0" scrolling="0" width="140" height="30" title="GitHub"></iframe>
+        </div>
         <h1 class="mdc-typography--headline4">Smart cards on the Web</h1>
         <p>WebCard enables a Web page to use locally connected smart cards.
-          Enter some APDU commands and select a reader to test.
+          After you install the extension, click on a reader in the list to send some APDU commands to the card.
         </p>
+        <p>The test below will try to send any hex sequences in a new line that begins with '> '</p>
         <label class="mdc-text-field mdc-text-field--outlined mdc-text-field--textarea">
           <textarea class="mdc-text-field__input webcard-apdu" aria-labelledby="my-label-id" rows="4" cols="80"
-            id="apduList" onfocus="showInput()" onblur="showTrace()">FFCA000000&#13;00A4040000</textarea>
+            id="apduList">> FFCA000000&#13;> 00A4040000</textarea>
           <span class="mdc-notched-outline">
             <span class="mdc-notched-outline__leading"></span>
             <span class="mdc-notched-outline__notch">
@@ -46,8 +59,6 @@
   new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field'));
   const list = new mdc.list.MDCList(document.querySelector('.mdc-deprecated-list'));
   const listItemRipples = list.listElements.map((elmX) => new MDCRipple(elmX));
-  let lastInput = "FFCA000000\n00A4040000";
-  let lastTrace = "FFCA000000\n00A4040000";
 
   var _readers;
 
@@ -78,27 +89,18 @@
     let startTime = new Date();
     let atr = await _readers[index].connect(true);
     console.log('connected ' + atr);
-    let apduList = lastInput.match(/(^[0-9A-Fa-f]+$)/gm);
+    let apduList = [...document.getElementById('apduList').value.matchAll(/^> ([0-9A-Fa-f]+)/gm)];
     let output = 'Testing card in ' + _readers[index].name + '\n';
     for (let i = 0; i < apduList.length; i++) {
-      var res = await _readers[index].transceive(apduList[i]);
-      output += '> ' + apduList[i] + '\n< ' + res + '\n';
+      let apdu = apduList[i][1];
+      var res = await _readers[index].transceive(apdu);
+      output += '> ' + apdu + '\n< ' + res + '\n';
       document.getElementById('apduList').value = output;
     }
     _readers[index].disconnect();
     let elapsed = new Date() - startTime;
     output += 'Total: ' + elapsed + 'ms'
     document.getElementById('apduList').value = output;
-  }
-
-  function showInput() {
-    lastTrace = document.getElementById('apduList').value;
-    document.getElementById('apduList').value = lastInput;
-  }
-
-  function showTrace() {
-    lastInput = document.getElementById('apduList').value;
-    document.getElementById('apduList').value = lastTrace;
   }
 
   navigator.webcard.cardInserted = function (reader) {
