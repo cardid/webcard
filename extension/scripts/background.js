@@ -37,14 +37,7 @@ function nativePortCallback(msg)
         if (contentPort)
         {
             msg.i = requestId;
-            try
-            {
-                contentPort.postMessage(msg);
-            } 
-            catch (error) 
-            {
-                contentPorts.delete(senderId);
-            }
+            contentPort.postMessage(msg);
         }
     }
     else if (msg.e)
@@ -53,16 +46,7 @@ function nativePortCallback(msg)
         // Broadcast to all content ports.
         contentPorts.forEach((port, senderId) =>
         {
-            try
-            {
-                port.postMessage(msg);
-            }
-            catch (error)
-            {
-                // Assuming that given content port is disconnected:
-                // "Error: Attempting to use a disconnected port object"
-                contentPorts.delete(senderId);
-            }
+            port.postMessage(msg);
         });
     }
 }
@@ -128,6 +112,13 @@ chrome.runtime.onConnect.addListener((contentPort) =>
 
             nativePort.postMessage(msg);
         }
+    });
+
+    // Called when [content script's tab] is closed.
+    contentPort.onDisconnect.addListener(() =>
+    {
+        console.log(`Tab ${senderId} disconnected.`);
+        contentPorts.delete(senderId);
     });
 });
 

@@ -1,7 +1,7 @@
 /******************************************************************************/
 // "Smart Card Extension" (WebCard): "content.js"
 
-const webcardVersion = '0.4.0';
+const webcardVersion = '0.4.2';
 
 let backgroundPort;
 
