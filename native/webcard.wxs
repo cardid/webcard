@@ -4,7 +4,7 @@
     Name="Smart Card Browser Extension" 
     Manufacturer="CardID.org"
     Language="1033" 
-    Version="0.4.0" 
+    Version="0.4.2" 
     InstallerVersion="100" 
     Scope="perUser" 
     ProductCode="98A81D16-A6DE-42D0-9DDD-A5AF3FB9BC47">
@@ -13,7 +13,7 @@
       <UpgradeVersion 
         Property="OLD_VERSION_FOUND" 
         Minimum="0.0.1" IncludeMinimum="yes"
-        Maximum="0.4.0" IncludeMaximum="no" 
+        Maximum="0.4.1" IncludeMaximum="no" 
         OnlyDetect="no" IgnoreRemoveFailure="yes" 
         MigrateFeatures="yes" />
     </Upgrade>

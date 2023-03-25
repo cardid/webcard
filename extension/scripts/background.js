@@ -37,7 +37,14 @@ function nativePortCallback(msg)
         if (contentPort)
         {
             msg.i = requestId;
-            contentPort.postMessage(msg);
+            try
+            {
+                contentPort.postMessage(msg);
+            } 
+            catch (error) 
+            {
+                contentPorts.delete(senderId);
+            }
         }
     }
     else if (msg.e)
