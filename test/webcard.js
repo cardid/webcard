@@ -47,7 +47,7 @@
         }
         else
         {
-            self.installerUrl = `${WEBCARD_HOMEPAGE}/webcard.dmg`;
+            self.installerUrl = `${WEBCARD_HOMEPAGE}/webcard.pkg`;
         }
 
         if (!self.isReady)
