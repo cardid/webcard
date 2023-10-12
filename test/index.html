@@ -12,20 +12,13 @@
 </head>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZMNXYYFSNB"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-ZMNXYYFSNB');
-</script>
 <body class="mdc-typograpby" onload="ListReaders()">
   <div class="mdc-layout-grid">
     <div class="mdc-layout-grid__inner">
       <div class="mdc-layout-grid__cell--span-3"></div>
       <div class="mdc-layout-grid__cell--span-6">
-        <div class="ghbtns">
-          <iframe src="https://ghbtns.com/github-btn.html?user=cardid&repo=webcard&type=star&count=true&size=large" frameborder="0" scrolling="0" width="140" height="30" title="GitHub"></iframe>
+        <div class="github-button">
+          <a class="github-button" href="https://github.com/cardid/webcard" data-size="large" data-show-count="true" aria-label="Star cardid/webcard on GitHub">Star</a>
         </div>
         <h1 class="mdc-typography--headline4">Smart cards on the Web</h1>
         <p>WebCard enables a Web page to use locally connected smart cards.
@@ -55,6 +48,7 @@
 </body>
 <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
 <script type="text/javascript" src="webcard.js"></script>
+<script async defer src="https://buttons.github.io/buttons.js"></script>
 <script type="text/javascript">
   new mdc.textField.MDCTextField(document.querySelector('.mdc-text-field'));
   const list = new mdc.list.MDCList(document.querySelector('.mdc-deprecated-list'));
