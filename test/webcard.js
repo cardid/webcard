@@ -225,6 +225,7 @@
                     // [Card removed]
                     case 2:
                     {
+                        _readerList[msg.r].atr = "";
                         self.cardRemoved?.(_readerList[msg.r]);
                         break;
                     }

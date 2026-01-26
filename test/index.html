@@ -10,8 +10,6 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
   <link rel="stylesheet" href="style.css">
 </head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZMNXYYFSNB"></script>
 <body class="mdc-typograpby" onload="ListReaders()">
   <div class="mdc-layout-grid">
     <div class="mdc-layout-grid__inner">
@@ -104,5 +102,15 @@
   navigator.webcard.cardRemoved = function (reader) {
     console.log('Card removed from ' + reader.name)
   } 
+
+  navigator.webcard.readersConnected = function (reader) {
+    console.log('Reader added: ' + reader);
+    ListReaders();
+  }
+
+  navigator.webcard.readersDisconnected = function (reader) {
+    console.log('Reader removed: ' + reader);
+    ListReaders();
+  }
 </script>
 </html>
