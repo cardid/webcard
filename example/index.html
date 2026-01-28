@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebCard Example</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>WebCard Example</h1>
+      <div class="github-button">
+        <a class="github-button" href="https://github.com/cardid/webcard" data-size="large" data-show-count="true" aria-label="Star cardid/webcard on GitHub" target="_blank" rel="noopener">
+          View on GitHub
+        </a>
+      </div>
+    </header>
+
+    <p class="intro">
+      This example demonstrates smart card access from a web page.
+      Connect a smart card reader and insert a card to get started.
+    </p>
+
+    <!-- Reader List Section -->
+    <section>
+      <h2>Smart Card Readers</h2>
+      <ul id="reader-list">
+        <li class="empty">No readers detected</li>
+      </ul>
+    </section>
+
+    <!-- APDU Testing Section -->
+    <section>
+      <h2>APDU Commands</h2>
+      <p>Select a reader above, then send commands to the card:</p>
+      <textarea id="apdu-input" rows="6" placeholder="Enter APDU commands (hex), one per line">FFCA000000
+00A4040000</textarea>
+      <div class="actions">
+        <button id="send-btn" disabled>Send Commands</button>
+      </div>
+      <pre id="output"></pre>
+    </section>
+  </main>
+
+  <script src="../dist/webcard.iife.js"></script>
+  <script src="app.js"></script>
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+</body>
+</html>

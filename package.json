@@ -1,0 +1,45 @@
+{
+  "name": "@cardid/webcard",
+  "version": "0.4.0",
+  "description": "Smart card browser extension library - enables web applications to communicate with local smart card readers via APDU commands",
+  "main": "dist/webcard.min.js",
+  "module": "dist/webcard.min.js",
+  "browser": "dist/webcard.iife.js",
+  "types": "dist/webcard.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/webcard.min.js",
+      "require": "./dist/webcard.iife.js",
+      "browser": "./dist/webcard.iife.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "node build.js",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cardid/webcard.git"
+  },
+  "keywords": [
+    "smart-card",
+    "smartcard",
+    "pcsc",
+    "apdu",
+    "browser-extension",
+    "webcard",
+    "nfc"
+  ],
+  "author": "CardID",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cardid/webcard/issues"
+  },
+  "homepage": "https://webcard.cardid.org",
+  "devDependencies": {
+    "esbuild": "^0.20.0"
+  }
+}
