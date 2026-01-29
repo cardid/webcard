@@ -24,13 +24,13 @@ Download and run the installer for your platform:
 
 **Option A: CDN (recommended)**
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@cardid/webcard/dist/webcard.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@cardid/webcard/dist/webcard.iife.js"></script>
 ```
 
 **Option B: ES Module**
 ```html
 <script type="module">
-  import 'https://esm.run/@cardid/webcard';
+  import 'https://cdn.jsdelivr.net/npm/@cardid/webcard/dist/webcard.min.js';
   // navigator.webcard is now available
 </script>
 ```

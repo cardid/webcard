@@ -4,7 +4,7 @@
 /******************************************************************************/
 'use strict';
 
-const WEBCARD_VERSION = '0.4.0';
+const WEBCARD_VERSION = '0.4.1';
 const WEBCARD_HOMEPAGE = 'https://webcard.cardid.org';
 
 /******************************************************************************/
@@ -162,7 +162,8 @@ function WebCard() {
     }
 
     // Fetches list of SmartCard readers connected to the PC.
-    self.readers = () => self.send(1);
+    self.getReaders = () => self.send(1);
+    self.readers = self.getReaders;
 
     // Handling content script (Native App) responses.
     self.responseCallback = (msg) => {
@@ -301,6 +302,7 @@ function initWebCard() {
 
     if (typeof navigator.webcard === 'undefined') {
         navigator.webcard = new WebCard();
+        navigator.webcard.getReaders();
     }
 }
 
