@@ -137,6 +137,7 @@ async function sendCommands() {
     sendBtn.disabled = true;
 
     try {
+        let startTime = Date.now();
         // Connect to card (shared mode)
         const atr = await reader.connect(true);
         output.textContent += `Connected. ATR: ${atr}\n\n`;
@@ -154,7 +155,7 @@ async function sendCommands() {
 
         // Disconnect
         await reader.disconnect();
-        output.textContent += 'Disconnected.';
+        output.textContent += `Disconnected. (${Date.now() - startTime} ms)`;
 
     } catch (err) {
         output.textContent += `Error: ${err.message || 'Connection failed'}`;
