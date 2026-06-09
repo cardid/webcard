@@ -1,6 +1,6 @@
 {
   "name": "@cardid/webcard",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Smart card browser extension library - enables web applications to communicate with local smart card readers via APDU commands",
   "main": "dist/webcard.min.js",
   "module": "dist/webcard.min.js",
