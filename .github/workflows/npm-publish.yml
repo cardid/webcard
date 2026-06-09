@@ -1,18 +1,9 @@
 name: Publish to npm
 
 on:
-  workflow_dispatch:
-    inputs:
-      version_bump:
-        description: 'Version bump type (or "none" to publish current version)'
-        required: true
-        default: 'none'
-        type: choice
-        options:
-          - none
-          - patch
-          - minor
-          - major
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   publish:
@@ -21,24 +12,16 @@ jobs:
       contents: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '24'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: npm install
-
-      - name: Bump version
-        if: ${{ github.event.inputs.version_bump != 'none' }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          npm version ${{ github.event.inputs.version_bump }} -m "Bump version to %s"
-          git push --follow-tags
 
       - name: Build
         run: npm run build
