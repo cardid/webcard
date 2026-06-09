@@ -3,48 +3,127 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WebCard Example</title>
+  <title>WebCard - Smart Card Extension</title>
   <link rel="icon" href="favicon.ico">
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
+  <!-- Suppress the library's default banner — this page has its own richer status notices -->
+  <script>window.WEBCARD_HIDE_BANNER = true;</script>
+  <!-- Load WebCard immediately so it provides status info -->
+  <script src="../dist/webcard.iife.js"></script>
+
+  <!-- Status notice: JS injects a dismissable banner here when needed -->
+  <div id="status-notice"></div>
+
   <main>
     <header>
-      <h1>WebCard Example</h1>
+      <div class="logo">
+        <h1>WebCard</h1>
+        <span class="badge">v0.4</span>
+      </div>
       <div class="github-button">
         <a class="github-button" href="https://github.com/cardid/webcard" data-size="large" data-show-count="true" aria-label="Star cardid/webcard on GitHub" target="_blank" rel="noopener">
           View on GitHub
         </a>
-      </div>
+      </div>      
     </header>
 
-    <p class="intro">
-      This example demonstrates smart card access from a web page.
-      Connect a smart card reader and insert a card to get started.
-    </p>
+    <!-- Playground: locked placeholder or live UI, activated by JS -->
+    <section id="playground" class="panel">
+      <h2>Playground</h2>
 
-    <!-- Reader List Section -->
-    <section>
-      <h2>Smart Card Readers</h2>
-      <ul id="reader-list">
-        <li class="empty">No readers detected</li>
-      </ul>
+      <!-- Shown when extension is not ready; JS removes this and activates the UI -->
+      <div id="playground-locked">
+        <p id="playground-locked-msg" class="locked-msg">Loading&hellip;</p>
+      </div>
+
+      <!-- Live reader + APDU UI; hidden until extension is ready -->
+      <div id="playground-ui" class="hidden">
+        <p class="intro-small">Select a reader with a card inserted, then send APDU commands.</p>
+
+        <div class="sub-panel">
+          <h3>Smart Card Readers</h3>
+          <ul id="reader-list">
+            <li class="empty"><div class="spinner"></div> Scanning for readers&hellip;</li>
+          </ul>
+        </div>
+
+        <div class="sub-panel">
+          <h3>APDU Commands</h3>
+          <textarea id="apdu-input" rows="4" placeholder="Enter APDU commands (hex), one per line" spellcheck="false">FFCA000000
+00A4040000</textarea>
+          <div class="actions">
+            <button id="send-btn" class="btn btn-primary" disabled>Run</button>
+          </div>
+          <pre id="output"></pre>
+        </div>
+      </div>
     </section>
 
-    <!-- APDU Testing Section -->
-    <section>
-      <h2>APDU Commands</h2>
-      <p>Select a reader above, then send commands to the card:</p>
-      <textarea id="apdu-input" rows="6" placeholder="Enter APDU commands (hex), one per line">FFCA000000
-00A4040000</textarea>
-      <div class="actions">
-        <button id="send-btn" disabled>Send Commands</button>
+    <!-- Developer documentation: always visible regardless of extension state -->
+    <section id="developer-docs">
+      <h2>Getting Started</h2>
+      <p class="intro-small">
+        WebCard is a cross-platform browser extension that gives web applications direct access to
+        local smart card readers via APDU commands. It works on Windows, macOS and Linux in
+        Chromium-based browsers (Chrome, Edge, Brave).
+      </p>
+
+      <div class="step-card">
+        <h4>Step 1 &mdash; Add the library to your page</h4>
+        <p>Choose whichever loading method suits your project:</p>
+        <p class="code-label">CDN (recommended — auto-initialises <code>navigator.webcard</code>)</p>
+        <pre><code>&lt;script src="https://cdn.jsdelivr.net/npm/@cardid/webcard/dist/webcard.iife.js"&gt;&lt;/script&gt;</code></pre>
+        <p class="code-label">ES Module</p>
+        <pre><code>&lt;script type="module"&gt;
+  import 'https://cdn.jsdelivr.net/npm/@cardid/webcard/dist/webcard.min.js';
+  // navigator.webcard is now available
+&lt;/script&gt;</code></pre>
+        <p class="code-label">npm</p>
+        <pre><code>npm install @cardid/webcard</code></pre>
+        <pre><code>import '@cardid/webcard'; // navigator.webcard is now available</code></pre>
       </div>
-      <pre id="output"></pre>
+
+      <div class="step-card">
+        <h4>Step 2 &mdash; List connected readers</h4>
+        <pre><code>const readers = await navigator.webcard.readers();
+// readers: [{ name: "ACS ACR122U", atr: "3B8F80..." }, ...]</code></pre>
+      </div>
+
+      <div class="step-card">
+        <h4>Step 3 &mdash; React to card &amp; reader events</h4>
+        <pre><code>navigator.webcard.cardInserted = (reader) =&gt; {
+  console.log(`Card in ${reader.name}, ATR: ${reader.atr}`);
+};
+
+navigator.webcard.cardRemoved = (reader) =&gt; {
+  console.log(`Card removed from ${reader.name}`);
+};
+
+navigator.webcard.readersConnected    = (count) =&gt; { /* USB reader plugged in   */ };
+navigator.webcard.readersDisconnected = (count) =&gt; { /* USB reader unplugged    */ };</code></pre>
+      </div>
+
+      <div class="step-card">
+        <h4>Step 4 &mdash; Communicate with a card</h4>
+        <pre><code>// connect(true) = shared mode, connect(false) = exclusive
+await reader.connect(true);
+
+// transceive sends an APDU hex string and returns the response hex string
+const response = await reader.transceive('FFCA000000'); // Get UID
+console.log(response); // e.g. "0412345678901234 9000"
+
+await reader.disconnect();</code></pre>
+      </div>
+
+      <p class="docs-link"><a href="https://github.com/cardid/webcard" target="_blank" rel="noopener">Full documentation on GitHub &rarr;</a></p>
     </section>
   </main>
 
-  <script src="../dist/webcard.iife.js"></script>
   <script src="app.js"></script>
   <script async defer src="https://buttons.github.io/buttons.js"></script>
 </body>
